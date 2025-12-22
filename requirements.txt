@@ -1,0 +1,8 @@
+google-adk==1.18.0
+google-generativeai==0.8.6
+fastapi
+uvicorn
+python-multipart
+python-dotenv
+pydantic
+typing-extensions
