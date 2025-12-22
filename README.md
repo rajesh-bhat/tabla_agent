@@ -77,8 +77,3 @@ python3 main.py path/to/your/performance.mp4
 - **Backend**: FastAPI, Uvicorn, Python-dotenv.
 - **Frontend**: Vanilla HTML5, Modern CSS (Glassmorphism), JavaScript (ES6+).
 - **Media**: Support for MP4, MOV, AVI, and WEBM.
-
----
-
-## 📜 Rhythmic Philosophy
-The **Tabla Agent** is built on the principles of **Taal-Shastra**. It focuses on the mathematical and aesthetic precision of rhythmic cycles. By combining visual hand monitoring with audio analysis, it provides a master-level critique usually found in one-on-one Taal training, specifically targeting the accuracy of the **Sam** and the clarity of rhythmic phrases (Bols).
