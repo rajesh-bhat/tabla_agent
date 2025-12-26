@@ -45,20 +45,13 @@ The agent requires a Google API Key to access the Gemini 3 Pro model.
 
 ## 🎬 Usage
 
-### Option 1: Web Interface (Recommended)
-The most intuitive way to interact with the Agent.
+Start the web server:
 
 ```bash
 python3 api.py
 ```
-Then open [http://localhost:8000](http://localhost:8000) in your browser.
 
-### Option 2: Command Line Interface (CLI)
-Process video files directly from your terminal.
-
-```bash
-python3 main.py path/to/your/performance.mp4
-```
+Then open [http://localhost:8000](http://localhost:8000) in your browser and upload your Tabla performance video for instant analysis.
 
 ---
 

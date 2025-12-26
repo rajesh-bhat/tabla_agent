@@ -75,36 +75,48 @@ document.addEventListener('DOMContentLoaded', () => {
         statusSection.classList.add('hidden');
         feedbackSection.classList.remove('hidden');
 
-        // Convert Markdown table to HTML table
-        let html = text;
+        console.log('Received text:', text);
+        console.log('Text type:', typeof text);
 
-        if (text.includes('|')) {
-            const lines = text.trim().split('\n');
-            let tableHtml = '<table><thead><tr>';
+        try {
+            // Try to parse as JSON
+            const analysis = JSON.parse(text);
+            console.log('Parsed JSON successfully:', analysis);
 
-            // Header
-            const headers = lines[0].split('|').filter(cell => cell.trim() !== '');
-            headers.forEach(h => tableHtml += `<th>${h.trim()}</th>`);
-            tableHtml += '</tr></thead><tbody>';
+            // Create HTML table from JSON
+            const html = `
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Agent's Assessment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Taal Identification</strong></td>
+                            <td>${analysis.taal_identification}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sam Analysis</strong></td>
+                            <td>${analysis.sam_analysis}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tempo (BPM)</strong></td>
+                            <td>${analysis.tempo_bpm}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
 
-            // Rows (skip index 1 as it's the separator |---|)
-            for (let i = 2; i < lines.length; i++) {
-                if (!lines[i].includes('|')) continue;
-                tableHtml += '<tr>';
-                const cells = lines[i].split('|').filter(cell => cell.trim() !== '');
-                cells.forEach(c => tableHtml += `<td>${c.trim()}</td>`);
-                tableHtml += '</tr>';
-            }
-            tableHtml += '</tbody></table>';
-            html = tableHtml;
-        } else {
-            // Fallback for non-table output
-            html = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n/g, '<br>');
+            console.log('Generated HTML table');
+            feedbackContent.innerHTML = html;
+        } catch (e) {
+            // Fallback: display as plain text if JSON parsing fails
+            console.error('JSON parse error:', e);
+            console.error('Failed text:', text);
+            feedbackContent.innerHTML = `<pre>${text}</pre>`;
         }
-
-        feedbackContent.innerHTML = html;
     }
 
     resetBtn.addEventListener('click', resetUI);

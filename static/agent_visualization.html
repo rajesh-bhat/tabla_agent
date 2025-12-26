@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla Agent - Architecture Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .architecture-summary {
+            background: #f3e8ff;
+            border-left: 4px solid #a78bfa;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+
+        .architecture-summary h2 {
+            color: #7c3aed;
+            margin-bottom: 1rem;
+        }
+
+        .architecture-summary ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .architecture-summary li {
+            margin: 0.5rem 0;
+            color: #4b5563;
+        }
+
+        .architecture-summary li::before {
+            content: "→ ";
+            color: #a78bfa;
+            font-weight: bold;
+        }
+
+        .agent-tree {
+            margin: 2rem 0;
+        }
+
+        .agent-node {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .agent-node:hover {
+            transform: translateX(10px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .agent-node.sequential {
+            border-left-color: #60a5fa;
+            background: linear-gradient(to right, #eff6ff, #f8f9fa);
+        }
+
+        .agent-node.parallel {
+            border-left-color: #a78bfa;
+            background: linear-gradient(to right, #f3e8ff, #f8f9fa);
+        }
+
+        .agent-node.llm {
+            border-left-color: #fbbf24;
+            background: linear-gradient(to right, #fef3c7, #f8f9fa);
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-icon {
+            font-size: 2rem;
+        }
+
+        .agent-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .agent-type {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .agent-type.sequential {
+            background: #60a5fa;
+        }
+
+        .agent-type.parallel {
+            background: #a78bfa;
+        }
+
+        .agent-type.llm {
+            background: #fbbf24;
+        }
+
+        .agent-description {
+            color: #6b7280;
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .agent-config {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .config-item {
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.25rem 0;
+        }
+
+        .config-label {
+            font-weight: 600;
+            color: #4b5563;
+            min-width: 120px;
+        }
+
+        .config-value {
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+        }
+
+        .sub-agents {
+            margin-left: 2rem;
+            margin-top: 1rem;
+            padding-left: 1rem;
+            border-left: 2px dashed #d1d5db;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .legend {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎵 Tabla Agent Architecture</h1>
+
+        <div class="architecture-summary">
+            <h2>Simplified 2-Step Architecture</h2>
+            <ul>
+                <li><strong>Step 1:</strong> ParallelAgent runs Taal and Sam agents concurrently</li>
+                <li><strong>Step 2:</strong> BPM agent uses Taal and Sam results, outputs final JSON</li>
+                <li><strong>Benefits:</strong> Faster execution, better BPM accuracy, simpler design</li>
+            </ul>
+        </div>
+
+        <div class="agent-tree">
+            <!-- Root: Sequential Agent -->
+            <div class="agent-node sequential">
+                <div class="agent-header">
+                    <span class="agent-icon">🔄</span>
+                    <span class="agent-name">TablaAnalysisPipeline</span>
+                    <span class="agent-type sequential">SequentialAgent</span>
+                </div>
+                <div class="agent-description">
+                    Coordinates Taal+Sam parallel analysis, then BPM calculation with final JSON output
+                </div>
+
+                <div class="sub-agents">
+                    <div class="flow-arrow">↓ Step 1: Parallel Analysis</div>
+
+                    <!-- Parallel Agent -->
+                    <div class="agent-node parallel">
+                        <div class="agent-header">
+                            <span class="agent-icon">⚡</span>
+                            <span class="agent-name">ParallelTaalSamAnalysis</span>
+                            <span class="agent-type parallel">ParallelAgent</span>
+                        </div>
+                        <div class="agent-description">
+                            Runs Taal and Sam analysis agents concurrently for speed
+                        </div>
+
+                        <div class="sub-agents">
+                            <!-- Taal Agent -->
+                            <div class="agent-node llm">
+                                <div class="agent-header">
+                                    <span class="agent-icon">🎵</span>
+                                    <span class="agent-name">TaalAgent</span>
+                                    <span class="agent-type llm">LlmAgent</span>
+                                </div>
+                                <div class="agent-description">
+                                    Identifies the Taal (rhythmic cycle) and beats per cycle
+                                </div>
+                                <div class="agent-config">
+                                    <div class="config-item">
+                                        <span class="config-label">Model:</span>
+                                        <span class="config-value">gemini-3-pro-preview</span>
+                                    </div>
+                                    <div class="config-item">
+                                        <span class="config-label">Temperature:</span>
+                                        <span class="config-value">0.2</span>
+                                    </div>
+                                    <div class="config-item">
+                                        <span class="config-label">Output Key:</span>
+                                        <span class="config-value">taal_result</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sam Agent -->
+                            <div class="agent-node llm">
+                                <div class="agent-header">
+                                    <span class="agent-icon">🎯</span>
+                                    <span class="agent-name">SamAgent</span>
+                                    <span class="agent-type llm">LlmAgent</span>
+                                </div>
+                                <div class="agent-description">
+                                    Detects the exact Sam (first beat) timestamp
+                                </div>
+                                <div class="agent-config">
+                                    <div class="config-item">
+                                        <span class="config-label">Model:</span>
+                                        <span class="config-value">gemini-3-pro-preview</span>
+                                    </div>
+                                    <div class="config-item">
+                                        <span class="config-label">Temperature:</span>
+                                        <span class="config-value">0.2</span>
+                                    </div>
+                                    <div class="config-item">
+                                        <span class="config-label">Output Key:</span>
+                                        <span class="config-value">sam_result</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">↓ Step 2: BPM Calculation & JSON Output</div>
+
+                    <!-- BPM Agent (Final Output) -->
+                    <div class="agent-node llm">
+                        <div class="agent-header">
+                            <span class="agent-icon">⏱️📊</span>
+                            <span class="agent-name">BPMAgent</span>
+                            <span class="agent-type llm">LlmAgent</span>
+                        </div>
+                        <div class="agent-description">
+                            Uses Taal (beats per cycle) and Sam (timestamp) to calculate exact tempo, then outputs final
+                            JSON with all three metrics
+                        </div>
+                        <div class="agent-config">
+                            <div class="config-item">
+                                <span class="config-label">Model:</span>
+                                <span class="config-value">gemini-3-pro-preview</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Temperature:</span>
+                                <span class="config-value">0.2</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Inputs:</span>
+                                <span class="config-value">{taal_result}, {sam_result}</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Output:</span>
+                                <span class="config-value">Final JSON (taal_identification, sam_analysis,
+                                    tempo_bpm)</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Methods:</span>
+                                <span class="config-value">Sam-to-Sam + Matra counting (cross-verified)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #60a5fa;"></div>
+                <span>Sequential Agent</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #a78bfa;"></div>
+                <span>Parallel Agent</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #fbbf24;"></div>
+                <span>LLM Agent</span>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
